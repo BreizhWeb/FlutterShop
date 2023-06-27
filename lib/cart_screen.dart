@@ -1,15 +1,41 @@
 import 'package:flutter/material.dart';
 
 class CartScreen extends StatefulWidget {
-  @override
+ @override
   _CartScreenState createState() => _CartScreenState();
 }
 
 class _CartScreenState extends State<CartScreen> {
-  int totalArticles = 0;
-  double totalPrice = 00.00;
-  int quantity = 0;
-  double itemTotalPrice = 0.00;
+  List<CartItem> cartItems = [
+    CartItem(
+      image: '../assets/pp.jpg',
+      name: 'Produit 1',
+      price: 25.00,
+      quantity: 0,
+    ),
+    CartItem(
+      image: '../assets/pp.jpg',
+      name: 'Produit 2',
+      price: 30.00,
+      quantity: 0,
+    ),
+  ];
+
+  int get totalArticles {
+    int total = 0;
+    for (var item in cartItems) {
+      total += item.quantity;
+    }
+    return total;
+  }
+
+  double get totalPrice {
+    double total = 0.00;
+    for (var item in cartItems) {
+      total += item.totalPrice;
+    }
+    return total;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +65,7 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                 ),
                 Text(
-                  'Prix total : \$${totalPrice.toStringAsFixed(2)}',
+                  'Prix total : \€${totalPrice.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 16,
                   ),
@@ -49,19 +75,11 @@ class _CartScreenState extends State<CartScreen> {
           ),
           Divider(height: 1.0, color: Colors.grey),
           Expanded(
-            child: ListView(
-              children: [
-                buildCartItem(
-                  image: 'assets/product_image1.png',
-                  name: 'Produit 1',
-                  price: 25.00,
-                ),
-                buildCartItem(
-                  image: 'assets/product_image2.png',
-                  name: 'Produit 2',
-                  price: 30.00,
-                ),
-              ],
+            child: ListView.builder(
+              itemCount: cartItems.length,
+              itemBuilder: (context, index) {
+                return buildCartItem(cartItems[index]);
+              },
             ),
           ),
         ],
@@ -69,38 +87,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget buildCartItem({
-    required String image,
-    required String name,
-    required double price,
-  }) {
-
-    void updateItemTotalPrice() {
-      setState(() {
-        itemTotalPrice = quantity * price;
-      });
-    }
-
-    void incrementQuantity() {
-      setState(() {
-        quantity++;
-        totalArticles++;
-        totalPrice += price;
-        updateItemTotalPrice();
-      });
-    }
-
-    void decrementQuantity() {
-      if (quantity > 0) {
-        setState(() {
-          quantity--;
-          totalArticles--;
-          totalPrice -= price;
-          updateItemTotalPrice();
-        });
-      }
-    }
-
+  Widget buildCartItem(CartItem item) {
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Row(
@@ -110,7 +97,7 @@ class _CartScreenState extends State<CartScreen> {
             height: 80,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(image),
+                image: AssetImage(item.image),
                 fit: BoxFit.cover,
               ),
             ),
@@ -121,7 +108,7 @@ class _CartScreenState extends State<CartScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  item.name,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -129,32 +116,38 @@ class _CartScreenState extends State<CartScreen> {
                 ),
                 SizedBox(height: 8.0),
                 Text(
-                  'Prix : \$${price.toStringAsFixed(2)}',
+                  'Prix : \€${item.price.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 14),
                 ),
               ],
             ),
           ),
           SizedBox(width: 16.0),
-          Column(
-            children: [
-              IconButton(
-                icon: Icon(Icons.remove),
-                onPressed: decrementQuantity,
-              ),
-              Text(
-                quantity.toString(),
-                style: TextStyle(fontSize: 16),
-              ),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: incrementQuantity,
-              ),
-            ],
+          IconButton(
+            icon: Icon(Icons.remove),
+            onPressed: () {
+              setState(() {
+                if (item.quantity > 0) {
+                  item.quantity--;
+                }
+              });
+            },
+          ),
+          Text(
+            item.quantity.toString(),
+            style: TextStyle(fontSize: 16),
+          ),
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              setState(() {
+                item.quantity++;
+              });
+            },
           ),
           SizedBox(width: 16.0),
           Text(
-            'Total : \$${itemTotalPrice.toStringAsFixed(2)}',
+            'Total : \€${item.totalPrice.toStringAsFixed(2)}',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -163,5 +156,23 @@ class _CartScreenState extends State<CartScreen> {
         ],
       ),
     );
+  }
+}
+
+class CartItem {
+  final String image;
+  final String name;
+  final double price;
+  int quantity;
+
+  CartItem({
+    required this.image,
+    required this.name,
+    required this.price,
+    required this.quantity,
+  });
+
+  double get totalPrice {
+    return price * quantity;
   }
 }
