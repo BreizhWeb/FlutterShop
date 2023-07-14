@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 
 class ProductCard extends StatelessWidget {
   final dynamic product;
+  final Function(dynamic) onAddToCart;
 
-  const ProductCard({required this.product, Key? key}) : super(key: key);
+  const ProductCard({required this.product, required this.onAddToCart, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +21,8 @@ class ProductCard extends StatelessWidget {
             child: Image.network(
               product['thumbnail'],
               fit: BoxFit.cover,
-              width: double.infinity, 
-              height: 200, 
+              width: double.infinity,
+              height: 200,
             ),
           ),
           Container(
@@ -76,6 +76,8 @@ class ProductCard extends StatelessWidget {
                   icon: Icon(Icons.add_shopping_cart),
                   tooltip: 'Add to cart',
                   onPressed: () {
+                    onAddToCart(product);
+                    _showAddToCartDialog(context, product['title']);
                   },
                 ),
               ],
@@ -83,6 +85,26 @@ class ProductCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showAddToCartDialog(BuildContext context, String productName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Product Added'),
+          content: Text('The product "$productName" has been added to the cart.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Ferme la boîte de dialogue
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

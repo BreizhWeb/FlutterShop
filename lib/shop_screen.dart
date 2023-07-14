@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutterapp/Card/product_card.dart';
+import 'package:flutterapp/cart_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ShopScreen extends StatefulWidget {
+  final List<CartItem> cartItems; // Ajouter le paramètre cartItems
+
+  const ShopScreen({Key? key, required this.cartItems}) : super(key: key);
+
   @override
   _ShopScreenState createState() => _ShopScreenState();
 }
@@ -30,6 +35,24 @@ class _ShopScreenState extends State<ShopScreen> {
     }
   }
 
+  void addToCart(dynamic product) {
+    setState(() {
+      final String? image = product['thumbnail'];
+      final String? name = product['title'];
+      final double? price = product['price'];
+
+      if (image != null && name != null && price != null) {
+        final newItem = CartItem(
+          image: image,
+          name: name,
+          price: price,
+          quantity: 1,
+        );
+        widget.cartItems.add(newItem); // Utiliser widget.cartItems pour accéder à la liste
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -46,7 +69,10 @@ class _ShopScreenState extends State<ShopScreen> {
         itemBuilder: (BuildContext context, int index) {
           final product = products.toList()[index];
 
-          return ProductCard(product: product);
+          return ProductCard(
+            product: product,
+            onAddToCart: addToCart,
+          );
         },
       ),
     );

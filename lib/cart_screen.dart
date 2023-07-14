@@ -1,26 +1,17 @@
 import 'package:flutter/material.dart';
 
 class CartScreen extends StatefulWidget {
- @override
+  final List<CartItem> cartItems;
+
+  const CartScreen({required this.cartItems});
+
+  @override
   _CartScreenState createState() => _CartScreenState();
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List<CartItem> cartItems = [
-    CartItem(
-      image: '../assets/pp.jpg',
-      name: 'Produit 1',
-      price: 25.00,
-      quantity: 0,
-    ),
-    CartItem(
-      image: '../assets/pp.jpg',
-      name: 'Produit 2',
-      price: 30.00,
-      quantity: 0,
-    ),
-  ];
 
+List<CartItem> get cartItems => widget.cartItems;
   int get totalArticles {
     int total = 0;
     for (var item in cartItems) {
@@ -170,7 +161,13 @@ class CartItem {
     required this.name,
     required this.price,
     required this.quantity,
-  });
+  }) {
+        print('CartItem - Name: $image');
+
+    print('CartItem - Name: $name');
+    print('CartItem - Price: $price');
+    print('CartItem - Quantity: $quantity');
+  }
 
   double get totalPrice {
     return price * quantity;
